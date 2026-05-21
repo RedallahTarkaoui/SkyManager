@@ -1,4 +1,3 @@
-
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
@@ -49,40 +48,40 @@ typedef struct noeud_r{
 }noeud_r;
 
 /* ============================================================
-   COMPTEURS D'IDS AUTO-INCREMENTES
+   AUTO-INCREMENTED ID COUNTERS
    ============================================================ */
 int compteur_vol = 1;
 int compteur_passager = 1;
 int compteur_reservation = 1;
 
 /* ============================================================
-   FONCTIONS UTILITAIRES / CONTROLES DE SAISIE
+   UTILITY FUNCTIONS / INPUT VALIDATION
    ============================================================ */
 
-/* Vider le buffer du clavier */
+/* Clear keyboard buffer */
 void vider_buffer(){
     int c;
     while((c = getchar()) != '\n' && c != EOF);
 }
 
-/* Afficher une ligne de separation */
+/* Print a separator line */
 void afficher_ligne(char c, int n){
     for(int i=0; i<n; i++) printf("%c", c);
     printf("\n");
 }
 
-/* Saisir un entier avec controle (min/max) */
+/* Read an integer with validation (min/max) */
 int saisir_entier(const char *message, int min, int max){
     int valeur;
     int ok = 0;
     do {
         printf("%s", message);
         if(scanf("%d", &valeur) != 1){
-            printf("  [!] Saisie invalide. Entrez un nombre entier.\n");
+            printf("  [!] Invalid input. Please enter an integer.\n");
             vider_buffer();
             ok = 0;
         } else if(valeur < min || valeur > max){
-            printf("  [!] Valeur hors limites (%d - %d).\n", min, max);
+            printf("  [!] Value out of bounds (%d - %d).\n", min, max);
             vider_buffer();
             ok = 0;
         } else {
@@ -93,7 +92,7 @@ int saisir_entier(const char *message, int min, int max){
     return valeur;
 }
 
-/* Saisir une chaine non vide */
+/* Read a non-empty string */
 void saisir_chaine(const char *message, char *dest, int taille){
     int ok = 0;
     do {
@@ -101,12 +100,12 @@ void saisir_chaine(const char *message, char *dest, int taille){
         if(fgets(dest, taille, stdin) == NULL){
             dest[0] = '\0';
         }
-        /* Supprimer le \n final */
+        /* Remove trailing newline */
         int len = strlen(dest);
         if(len > 0 && dest[len-1] == '\n') dest[len-1] = '\0';
-        /* Verifier non vide */
+        /* Check if not empty */
         if(strlen(dest) == 0){
-            printf("  [!] Ce champ ne peut pas etre vide.\n");
+            printf("  [!] This field cannot be empty.\n");
             ok = 0;
         } else {
             ok = 1;
@@ -114,7 +113,7 @@ void saisir_chaine(const char *message, char *dest, int taille){
     } while(!ok);
 }
 
-/* Valider format heure HH:MM */
+/* Validate HH:MM time format */
 int valider_heure(const char *heure){
     if(strlen(heure) != 5) return 0;
     if(!isdigit(heure[0]) || !isdigit(heure[1])) return 0;
@@ -125,7 +124,7 @@ int valider_heure(const char *heure){
     return (h >= 0 && h <= 23 && m >= 0 && m <= 59);
 }
 
-/* Saisir une heure au format HH:MM */
+/* Read a time in HH:MM format */
 void saisir_heure(const char *message, char *dest){
     int ok = 0;
     do {
@@ -134,7 +133,7 @@ void saisir_heure(const char *message, char *dest){
         int len = strlen(dest);
         if(len > 0 && dest[len-1] == '\n') dest[len-1] = '\0';
         if(!valider_heure(dest)){
-            printf("  [!] Format invalide. Utilisez HH:MM (ex: 08:30).\n");
+            printf("  [!] Invalid format. Use HH:MM (e.g., 08:30).\n");
             ok = 0;
         } else {
             ok = 1;
@@ -142,7 +141,7 @@ void saisir_heure(const char *message, char *dest){
     } while(!ok);
 }
 
-/* Valider format date YYYY-MM-DD avec verification stricte des jours/mois */
+/* Validate YYYY-MM-DD date format with strict day/month check */
 int valider_date(const char *date){
     if(strlen(date) != 10) return 0;
     for(int i=0;i<10;i++){
@@ -155,15 +154,15 @@ int valider_date(const char *date){
     if(annee < 2000 || annee > 9999) return 0;
     if(mois < 1 || mois > 12) return 0;
     if(jour < 1) return 0;
-    /* Jours max par mois */
+    /* Maximum days per month */
     int jours_max[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-    /* Annee bissextile : divisible par 4, sauf centenaires non divisibles par 400 */
+    /* Leap year check: divisible by 4, except centuries not divisible by 400 */
     int bissextile = (annee % 4 == 0 && (annee % 100 != 0 || annee % 400 == 0));
     if(mois == 2 && bissextile) jours_max[2] = 29;
     return (jour <= jours_max[mois]);
 }
 
-/* Saisir une date au format YYYY-MM-DD */
+/* Read a date in YYYY-MM-DD format */
 void saisir_date(const char *message, char *dest){
     int ok = 0;
     do {
@@ -172,7 +171,7 @@ void saisir_date(const char *message, char *dest){
         int len = strlen(dest);
         if(len > 0 && dest[len-1] == '\n') dest[len-1] = '\0';
         if(!valider_date(dest)){
-            printf("  [!] Format invalide. Utilisez YYYY-MM-DD (ex: 2025-06-15).\n");
+            printf("  [!] Invalid format. Use YYYY-MM-DD (e.g., 2025-06-15).\n");
             ok = 0;
         } else {
             ok = 1;
@@ -180,18 +179,18 @@ void saisir_date(const char *message, char *dest){
     } while(!ok);
 }
 
-/* Attendre que l utilisateur appuie sur Entree */
+/* Wait for user to press Enter */
 void attendre_entree(){
-    printf("\n  Appuyez sur Entree pour continuer...");
+    printf("\n  Press Enter to continue...");
     vider_buffer();
 }
 
 /* ============================================================
-   FONCTIONS METIER VOLS
+   FLIGHT MANAGEMENT FUNCTIONS
    ============================================================ */
 noeud_v* creer_vol(vol v){
     noeud_v*newE=(noeud_v*)malloc(sizeof(noeud_v));
-    if(newE==NULL){ printf("Echec d'allocation!\n"); return newE; }
+    if(newE==NULL){ printf("Allocation failed!\n"); return newE; }
     newE->data=v;
     newE->next=NULL;
     return newE;
@@ -199,10 +198,10 @@ noeud_v* creer_vol(vol v){
 
 noeud_v* AjoutVol(noeud_v *tete,vol v){
     noeud_v *newE=creer_vol(v);
-    if(newE==NULL){ printf("Echec d allocation!\n"); return tete; }
+    if(newE==NULL){ printf("Allocation failed!\n"); return tete; }
     if(tete==NULL||strcmp(v.heure_depart,tete->data.heure_depart)<0){
         newE->next=tete; tete=newE;
-        printf("  [OK] Vol ajoute avec succes!\n");
+        printf("  [OK] Flight added successfully!\n");
         return tete;
     }
     noeud_v*temp=tete;
@@ -210,17 +209,17 @@ noeud_v* AjoutVol(noeud_v *tete,vol v){
         temp=temp->next;
     newE->next=temp->next;
     temp->next=newE;
-    printf("  [OK] Vol ajoute avec succes!\n");
+    printf("  [OK] Flight added successfully!\n");
     return tete;
 }
 
 void afficherVols(noeud_v *tete){
-    if(tete==NULL){ printf("  Aucun vol disponible.\n"); return; }
+    if(tete==NULL){ printf("  No flights available.\n"); return; }
     noeud_v *temp=tete;
     printf("\n");
     afficher_ligne('-', 72);
     printf("  %-4s %-20s %-20s %-8s %-8s %-6s\n",
-           "ID","Depart","Arrivee","H.Dep","H.Arr","Places");
+           "ID","Departure","Arrival","Dep.Time","Arr.Time","Seats");
     afficher_ligne('-', 72);
     while(temp!=NULL){
         printf("  %-4d %-20s %-20s %-8s %-8s %-6d\n",
@@ -245,30 +244,30 @@ noeud_v* chercherVol(noeud_v* tete,int id){
 }
 
 void saisie_modif(vol *v){
-    printf("\n  --- Modification du vol ---\n");
-    saisir_chaine("  Nouvelle ville de depart  : ", v->ville_depart, 100);
-    saisir_chaine("  Nouvelle ville d'arrivee  : ", v->ville_arrivee, 100);
-    saisir_heure ("  Nouvelle heure de depart  : ", v->heure_depart);
-    saisir_heure ("  Nouvelle heure d'arrivee  : ", v->heure_arrivee);
-    v->nb_places = saisir_entier("  Nouveau nombre de places  : ", 1, 9999);
-    printf("  [OK] Vol modifie avec succes!\n");
+    printf("\n  --- Modify Flight ---\n");
+    saisir_chaine("  New departure city  : ", v->ville_depart, 100);
+    saisir_chaine("  New arrival city    : ", v->ville_arrivee, 100);
+    saisir_heure ("  New departure time  : ", v->heure_depart);
+    saisir_heure ("  New arrival time    : ", v->heure_arrivee);
+    v->nb_places = saisir_entier("  New number of seats : ", 1, 9999);
+    printf("  [OK] Flight modified successfully!\n");
 }
 
 noeud_v* ModifierVol(noeud_v*tete,int idf){
-    if(tete==NULL){ printf("  Aucun vol a modifier, la liste est vide.\n"); return tete; }
+    if(tete==NULL){ printf("  No flights to modify, list is empty.\n"); return tete; }
     noeud_v* vol_modif=chercherVol(tete,idf);
-    if(vol_modif==NULL){ printf("  [!] Aucun vol avec l'ID %d.\n", idf); return tete; }
+    if(vol_modif==NULL){ printf("  [!] No flight with ID %d.\n", idf); return tete; }
     saisie_modif(&vol_modif->data);
     return tete;
 }
 
 noeud_v* SupprimerVol(noeud_v*tete,noeud_r**listeR,int id){
-    if(tete==NULL){ printf("  Aucun vol a supprimer, la liste est vide.\n"); return tete; }
+    if(tete==NULL){ printf("  No flights to delete, list is empty.\n"); return tete; }
     noeud_v*tempV=tete;
     noeud_v*prevV=NULL;
     while(tempV!=NULL&&tempV->data.id!=id){ prevV=tempV; tempV=tempV->next; }
-    if(tempV==NULL){ printf("  [!] Aucun vol avec l'ID %d.\n", id); return tete; }
-    /* Supprimer toutes les reservations liees au vol (les places n ont plus d utilite) */
+    if(tempV==NULL){ printf("  [!] No flight with ID %d.\n", id); return tete; }
+    /* Delete all reservations linked to this flight */
     noeud_r*tempR=*listeR;
     noeud_r*prevR=NULL;
     int nb_res_supprimees = 0;
@@ -281,22 +280,22 @@ noeud_v* SupprimerVol(noeud_v*tete,noeud_r**listeR,int id){
             nb_res_supprimees++;
         } else { prevR=tempR; tempR=tempR->next; }
     }
-    /* Supprimer le vol lui-meme */
+    /* Delete the flight itself */
     if(prevV==NULL) tete=tete->next;
     else prevV->next=tempV->next;
     free(tempV);
     if(nb_res_supprimees > 0)
-        printf("  [i] %d reservation(s) liee(s) supprimee(s).\n", nb_res_supprimees);
-    printf("  [OK] Vol et ses reservations supprimes!\n");
+        printf("  [i] %d related reservation(s) deleted.\n", nb_res_supprimees);
+    printf("  [OK] Flight and its reservations deleted!\n");
     return tete;
 }
 
 /* ============================================================
-   FONCTIONS METIER PASSAGERS
+   PASSENGER MANAGEMENT FUNCTIONS
    ============================================================ */
 noeud_p* creer_passager(passager p){
     noeud_p*newE=(noeud_p*)malloc(sizeof(noeud_p));
-    if(newE==NULL){ printf("Echec d'allocation!\n"); return newE; }
+    if(newE==NULL){ printf("Allocation failed!\n"); return newE; }
     newE->data=p;
     newE->next=NULL;
     return newE;
@@ -304,10 +303,10 @@ noeud_p* creer_passager(passager p){
 
 noeud_p* AjoutPassager(noeud_p *tete,passager p){
     noeud_p *newE=creer_passager(p);
-    if(newE==NULL){ printf("Echec d allocation!\n"); return tete; }
+    if(newE==NULL){ printf("Allocation failed!\n"); return tete; }
     if(tete==NULL||p.id<tete->data.id){
         newE->next=tete; tete=newE;
-        printf("  [OK] Passager ajoute avec succes!\n");
+        printf("  [OK] Passenger added successfully!\n");
         return tete;
     }
     noeud_p*temp=tete;
@@ -315,17 +314,17 @@ noeud_p* AjoutPassager(noeud_p *tete,passager p){
         temp=temp->next;
     newE->next=temp->next;
     temp->next=newE;
-    printf("  [OK] Passager ajoute avec succes!\n");
+    printf("  [OK] Passenger added successfully!\n");
     return tete;
 }
 
 void afficherPassagers(noeud_p *tete){
-    if(tete==NULL){ printf("  Aucun passager disponible.\n"); return; }
+    if(tete==NULL){ printf("  No passengers available.\n"); return; }
     noeud_p *temp=tete;
     printf("\n");
     afficher_ligne('-', 78);
     printf("  %-4s %-15s %-15s %-4s %-12s %-15s\n",
-           "ID","Nom","Prenom","Age","Passeport","Nationalite");
+           "ID","Last Name","First Name","Age","Passport","Nationality");
     afficher_ligne('-', 78);
     while(temp!=NULL){
         printf("  %-4d %-15s %-15s %-4d %-12s %-15s\n",
@@ -350,35 +349,35 @@ noeud_p* chercherPassager(noeud_p* tete,int id){
 }
 
 void saisie_modif_P(passager *p){
-    printf("\n  --- Modification du passager ---\n");
-    p->age = saisir_entier("  Nouvel age            : ", 1, 120);
-    saisir_chaine("  Nouveau nom           : ", p->nom, 50);
-    saisir_chaine("  Nouveau prenom        : ", p->prenom, 50);
-    saisir_chaine("  Nouveau num passeport : ", p->num_passeport, 50);
-    saisir_chaine("  Nouvelle nationalite  : ", p->nationalite, 50);
-    printf("  [OK] Passager modifie avec succes!\n");
+    printf("\n  --- Modify Passenger ---\n");
+    p->age = saisir_entier("  New age            : ", 1, 120);
+    saisir_chaine("  New last name      : ", p->nom, 50);
+    saisir_chaine("  New first name     : ", p->prenom, 50);
+    saisir_chaine("  New passport number: ", p->num_passeport, 50);
+    saisir_chaine("  New nationality    : ", p->nationalite, 50);
+    printf("  [OK] Passenger modified successfully!\n");
 }
 
 noeud_p* ModifierPassager(noeud_p*tete,int idf){
-    if(tete==NULL){ printf("  Aucun passager a modifier, la liste est vide.\n"); return tete; }
+    if(tete==NULL){ printf("  No passengers to modify, list is empty.\n"); return tete; }
     noeud_p* psg_modif=chercherPassager(tete,idf);
-    if(psg_modif==NULL){ printf("  [!] Aucun passager avec l'ID %d.\n", idf); return tete; }
+    if(psg_modif==NULL){ printf("  [!] No passenger with ID %d.\n", idf); return tete; }
     saisie_modif_P(&psg_modif->data);
     return tete;
 }
 
 noeud_p* SupprimerPassager(noeud_p*tete,noeud_r**listeR,noeud_v*listeV,int id){
-    if(tete==NULL){ printf("  Aucun passager a supprimer, la liste est vide.\n"); return tete; }
+    if(tete==NULL){ printf("  No passengers to delete, list is empty.\n"); return tete; }
     noeud_p*tempP=tete;
     noeud_p*prevP=NULL;
     while(tempP!=NULL&&tempP->data.id!=id){ prevP=tempP; tempP=tempP->next; }
-    if(tempP==NULL){ printf("  [!] Aucun passager avec l'ID %d.\n", id); return tete; }
+    if(tempP==NULL){ printf("  [!] No passenger with ID %d.\n", id); return tete; }
     noeud_r*tempR=*listeR;
     noeud_r*prevR=NULL;
     while(tempR!=NULL){
         if(tempR->data.id_passager==id){
             noeud_r*sup=tempR;
-            /* CORRECTION: restituer les places au vol */
+            /* FIX: Return reserved seats to the flight */
             noeud_v*vol=chercherVol(listeV, sup->data.id_vol);
             if(vol!=NULL) vol->data.nb_places+=sup->data.nb_places;
             if(prevR==NULL){ *listeR=tempR->next; tempR=*listeR; }
@@ -389,16 +388,16 @@ noeud_p* SupprimerPassager(noeud_p*tete,noeud_r**listeR,noeud_v*listeV,int id){
     if(prevP==NULL) tete=tete->next;
     else prevP->next=tempP->next;
     free(tempP);
-    printf("  [OK] Passager et ses reservations supprimes!\n");
+    printf("  [OK] Passenger and their reservations deleted!\n");
     return tete;
 }
 
 /* ============================================================
-   FONCTIONS METIER RESERVATIONS
+   RESERVATION MANAGEMENT FUNCTIONS
    ============================================================ */
 noeud_r* creer_reservation(reservation r){
     noeud_r*newE=(noeud_r*)malloc(sizeof(noeud_r));
-    if(newE==NULL){ printf("Echec d'allocation!\n"); return newE; }
+    if(newE==NULL){ printf("Allocation failed!\n"); return newE; }
     newE->data=r;
     newE->next=NULL;
     return newE;
@@ -406,10 +405,10 @@ noeud_r* creer_reservation(reservation r){
 
 noeud_r* AjoutReservationTriee(noeud_r *tete,reservation r){
     noeud_r *newE=creer_reservation(r);
-    if(newE==NULL){ printf("Echec d allocation!\n"); return tete; }
+    if(newE==NULL){ printf("Allocation failed!\n"); return tete; }
     if(tete==NULL||strcmp(r.date_reservation,tete->data.date_reservation)<0){
         newE->next=tete; tete=newE;
-        printf("  [OK] Reservation effectuee avec succes!\n");
+        printf("  [OK] Reservation completed successfully!\n");
         return tete;
     }
     noeud_r*temp=tete;
@@ -417,34 +416,34 @@ noeud_r* AjoutReservationTriee(noeud_r *tete,reservation r){
         temp=temp->next;
     newE->next=temp->next;
     temp->next=newE;
-    printf("  [OK] Reservation effectuee avec succes!\n");
+    printf("  [OK] Reservation completed successfully!\n");
     return tete;
 }
 
 noeud_r* AjoutReservation(noeud_r*tete,noeud_v*listeV,noeud_p*listeP,reservation r){
     noeud_v*vol=chercherVol(listeV,r.id_vol);
-    if(vol==NULL){ printf("  [!] Vol introuve (ID %d), echec de reservation!\n", r.id_vol); return tete; }
+    if(vol==NULL){ printf("  [!] Flight not found (ID %d), reservation failed!\n", r.id_vol); return tete; }
     noeud_p *passager=chercherPassager(listeP,r.id_passager);
-    if(passager==NULL){ printf("  [!] Passager introuvable (ID %d), echec de reservation!\n", r.id_passager); return tete; }
+    if(passager==NULL){ printf("  [!] Passenger not found (ID %d), reservation failed!\n", r.id_passager); return tete; }
     if(vol->data.nb_places < r.nb_places){
-        printf("  [!] Places insuffisantes (%d disponibles, %d demandees).\n", vol->data.nb_places, r.nb_places);
+        printf("  [!] Insufficient seats (%d available, %d requested).\n", vol->data.nb_places, r.nb_places);
         return tete;
     }
-    /* Toutes les verifications passees : attribuer l'ID et creer la reservation */
+    /* All validations passed: assign ID and create reservation */
     r.id = compteur_reservation++;
-    printf("  [i] Reservation ID auto: %d\n", r.id);
+    printf("  [i] Auto-assigned Reservation ID: %d\n", r.id);
     vol->data.nb_places-=r.nb_places;
     tete=AjoutReservationTriee(tete,r);
     return tete;
 }
 
 void afficherReservations(noeud_r *tete){
-    if(tete==NULL){ printf("  Aucune reservation.\n"); return; }
+    if(tete==NULL){ printf("  No reservations found.\n"); return; }
     noeud_r *temp=tete;
     printf("\n");
     afficher_ligne('-', 60);
     printf("  %-5s %-6s %-8s %-12s %-7s\n",
-           "ID","Vol","Passager","Date","Places");
+           "ID","Flight","Passenger","Date","Seats");
     afficher_ligne('-', 60);
     while(temp!=NULL){
         printf("  %-5d %-6d %-8d %-12s %-7d\n",
@@ -459,56 +458,56 @@ void afficherReservations(noeud_r *tete){
 }
 
 noeud_r* SupprimerReservation(noeud_r*tete,noeud_v*listeV,int id){
-    if(tete==NULL){ printf("  Aucune reservation a supprimer, la liste est vide.\n"); return tete; }
+    if(tete==NULL){ printf("  No reservations to delete, list is empty.\n"); return tete; }
     noeud_r*temp=tete;
     noeud_r*prev=NULL;
     while(temp!=NULL&&temp->data.id!=id){ prev=temp; temp=temp->next; }
-    if(temp==NULL){ printf("  [!] Aucune reservation avec l'ID %d.\n", id); return tete; }
+    if(temp==NULL){ printf("  [!] No reservation with ID %d.\n", id); return tete; }
     noeud_v*vol=chercherVol(listeV,temp->data.id_vol);
-    if(vol==NULL) printf("  [!] Attention: vol lie introuvable, places non restituees.\n");
+    if(vol==NULL) printf("  [!] Warning: Linked flight not found, seats not returned.\n");
     else vol->data.nb_places+=temp->data.nb_places;
     if(prev==NULL) tete=temp->next;
     else prev->next=temp->next;
     free(temp);
-    printf("  [OK] Reservation supprimee avec succes!\n");
+    printf("  [OK] Reservation deleted successfully!\n");
     return tete;
 }
 
 /* ============================================================
-   FONCTIONS DE SAISIE METIER
+   ENTITY INPUT FUNCTIONS
    ============================================================ */
 vol saisir_vol(){
     vol v;
     v.id = compteur_vol++;
-    printf("\n  --- Nouveau vol (ID auto: %d) ---\n", v.id);
-    saisir_chaine("  Ville de depart   : ", v.ville_depart, 100);
-    saisir_chaine("  Ville d'arrivee   : ", v.ville_arrivee, 100);
-    saisir_heure ("  Heure de depart   : ", v.heure_depart);
-    saisir_heure ("  Heure d'arrivee   : ", v.heure_arrivee);
-    v.nb_places = saisir_entier("  Nombre de places  : ", 1, 9999);
+    printf("\n  --- New Flight (Auto ID: %d) ---\n", v.id);
+    saisir_chaine("  Departure city   : ", v.ville_depart, 100);
+    saisir_chaine("  Arrival city     : ", v.ville_arrivee, 100);
+    saisir_heure ("  Departure time   : ", v.heure_depart);
+    saisir_heure ("  Arrival time     : ", v.heure_arrivee);
+    v.nb_places = saisir_entier("  Number of seats  : ", 1, 9999);
     return v;
 }
 
 passager saisir_passager(){
     passager p;
     p.id = compteur_passager++;
-    printf("\n  --- Nouveau passager (ID auto: %d) ---\n", p.id);
+    printf("\n  --- New Passenger (Auto ID: %d) ---\n", p.id);
     p.age = saisir_entier("  Age              : ", 1, 120);
-    saisir_chaine("  Nom              : ", p.nom, 50);
-    saisir_chaine("  Prenom           : ", p.prenom, 50);
-    saisir_chaine("  Num. passeport   : ", p.num_passeport, 50);
-    saisir_chaine("  Nationalite      : ", p.nationalite, 50);
+    saisir_chaine("  Last name        : ", p.nom, 50);
+    saisir_chaine("  First name       : ", p.prenom, 50);
+    saisir_chaine("  Passport number  : ", p.num_passeport, 50);
+    saisir_chaine("  Nationality      : ", p.nationalite, 50);
     return p;
 }
 
 reservation saisir_reservation(){
     reservation r;
-    /* L'ID sera attribue apres validation dans AjoutReservation */
+    /* ID will be assigned after validation in AjoutReservation */
     r.id = 0;
-    printf("\n  --- Nouvelle reservation ---\n");
-    r.id_vol      = saisir_entier("  ID du vol        : ", 1, 99999);
-    r.id_passager = saisir_entier("  ID du passager   : ", 1, 99999);
-    r.nb_places   = saisir_entier("  Nombre de places : ", 1, 9999);
+    printf("\n  --- New Reservation ---\n");
+    r.id_vol      = saisir_entier("  Flight ID        : ", 1, 99999);
+    r.id_passager = saisir_entier("  Passenger ID     : ", 1, 99999);
+    r.nb_places   = saisir_entier("  Number of seats  : ", 1, 9999);
     saisir_date("  Date (YYYY-MM-DD) : ", r.date_reservation);
     return r;
 }
@@ -526,15 +525,15 @@ void afficher_entete(const char *titre){
 void menu_vols(noeud_v**listeV, noeud_r**listeR){
     int choix;
     do {
-        afficher_entete("GESTION DES VOLS");
-        printf("  [1] Ajouter un vol\n");
-        printf("  [2] Afficher tous les vols\n");
-        printf("  [3] Rechercher un vol\n");
-        printf("  [4] Modifier un vol\n");
-        printf("  [5] Supprimer un vol\n");
-        printf("  [0] Retour au menu principal\n");
+        afficher_entete("FLIGHT MANAGEMENT");
+        printf("  [1] Add a flight\n");
+        printf("  [2] Display all flights\n");
+        printf("  [3] Search for a flight\n");
+        printf("  [4] Modify a flight\n");
+        printf("  [5] Delete a flight\n");
+        printf("  [0] Back to main menu\n");
         afficher_ligne('-', 60);
-        choix = saisir_entier("  Votre choix : ", 0, 5);
+        choix = saisir_entier("  Your choice : ", 0, 5);
 
         switch(choix){
             case 1:{
@@ -544,47 +543,47 @@ void menu_vols(noeud_v**listeV, noeud_r**listeR){
                 break;
             }
             case 2:{
-                afficher_entete("LISTE DES VOLS");
+                afficher_entete("FLIGHT LIST");
                 afficherVols(*listeV);
                 attendre_entree();
                 break;
             }
             case 3:{
-                afficher_entete("RECHERCHE VOL");
+                afficher_entete("FLIGHT SEARCH");
                 afficherVols(*listeV);
-                int id = saisir_entier("  ID du vol a rechercher : ", 1, 99999);
+                int id = saisir_entier("  Flight ID to search : ", 1, 99999);
                 noeud_v* v = chercherVol(*listeV, id);
                 if(v==NULL){
-                    printf("  [!] Aucun vol avec l'ID %d.\n", id);
+                    printf("  [!] No flight with ID %d.\n", id);
                 } else {
                     afficher_ligne('-', 60);
-                    printf("  ID       : %d\n", v->data.id);
-                    printf("  Depart   : %s\n", v->data.ville_depart);
-                    printf("  Arrivee  : %s\n", v->data.ville_arrivee);
-                    printf("  H.Dep.   : %s\n", v->data.heure_depart);
-                    printf("  H.Arr.   : %s\n", v->data.heure_arrivee);
-                    printf("  Places   : %d\n", v->data.nb_places);
+                    printf("  ID         : %d\n", v->data.id);
+                    printf("  Departure  : %s\n", v->data.ville_depart);
+                    printf("  Arrival    : %s\n", v->data.ville_arrivee);
+                    printf("  Dep. Time  : %s\n", v->data.heure_depart);
+                    printf("  Arr. Time  : %s\n", v->data.heure_arrivee);
+                    printf("  Seats      : %d\n", v->data.nb_places);
                     afficher_ligne('-', 60);
                 }
                 attendre_entree();
                 break;
             }
             case 4:{
-                afficher_entete("MODIFIER VOL");
+                afficher_entete("MODIFY FLIGHT");
                 afficherVols(*listeV);
-                int id = saisir_entier("  ID du vol a modifier : ", 1, 99999);
+                int id = saisir_entier("  Flight ID to modify : ", 1, 99999);
                 *listeV = ModifierVol(*listeV, id);
                 attendre_entree();
                 break;
             }
             case 5:{
-                afficher_entete("SUPPRIMER VOL");
+                afficher_entete("DELETE FLIGHT");
                 afficherVols(*listeV);
-                int id = saisir_entier("  ID du vol a supprimer : ", 1, 99999);
-                printf("  [?] Confirmer la suppression du vol %d et toutes ses reservations ? (1=Oui / 0=Non) : ", id);
+                int id = saisir_entier("  Flight ID to delete : ", 1, 99999);
+                printf("  [?] Confirm deletion of flight %d and all its reservations? (1=Yes / 0=No) : ", id);
                 int conf = saisir_entier("", 0, 1);
                 if(conf == 1) *listeV = SupprimerVol(*listeV, listeR, id);
-                else printf("  Suppression annulee.\n");
+                else printf("  Deletion cancelled.\n");
                 attendre_entree();
                 break;
             }
@@ -595,15 +594,15 @@ void menu_vols(noeud_v**listeV, noeud_r**listeR){
 void menu_passagers(noeud_p**listeP, noeud_r**listeR, noeud_v*listeV){
     int choix;
     do {
-        afficher_entete("GESTION DES PASSAGERS");
-        printf("  [1] Ajouter un passager\n");
-        printf("  [2] Afficher tous les passagers\n");
-        printf("  [3] Rechercher un passager\n");
-        printf("  [4] Modifier un passager\n");
-        printf("  [5] Supprimer un passager\n");
-        printf("  [0] Retour au menu principal\n");
+        afficher_entete("PASSENGER MANAGEMENT");
+        printf("  [1] Add a passenger\n");
+        printf("  [2] Display all passengers\n");
+        printf("  [3] Search for a passenger\n");
+        printf("  [4] Modify a passenger\n");
+        printf("  [5] Delete a passenger\n");
+        printf("  [0] Back to main menu\n");
         afficher_ligne('-', 60);
-        choix = saisir_entier("  Votre choix : ", 0, 5);
+        choix = saisir_entier("  Your choice : ", 0, 5);
 
         switch(choix){
             case 1:{
@@ -613,47 +612,47 @@ void menu_passagers(noeud_p**listeP, noeud_r**listeR, noeud_v*listeV){
                 break;
             }
             case 2:{
-                afficher_entete("LISTE DES PASSAGERS");
+                afficher_entete("PASSENGER LIST");
                 afficherPassagers(*listeP);
                 attendre_entree();
                 break;
             }
             case 3:{
-                afficher_entete("RECHERCHE PASSAGER");
+                afficher_entete("PASSENGER SEARCH");
                 afficherPassagers(*listeP);
-                int id = saisir_entier("  ID du passager a rechercher : ", 1, 99999);
+                int id = saisir_entier("  Passenger ID to search : ", 1, 99999);
                 noeud_p* p = chercherPassager(*listeP, id);
                 if(p==NULL){
-                    printf("  [!] Aucun passager avec l'ID %d.\n", id);
+                    printf("  [!] No passenger with ID %d.\n", id);
                 } else {
                     afficher_ligne('-', 60);
                     printf("  ID          : %d\n",  p->data.id);
-                    printf("  Nom         : %s\n",  p->data.nom);
-                    printf("  Prenom      : %s\n",  p->data.prenom);
+                    printf("  Last Name   : %s\n",  p->data.nom);
+                    printf("  First Name  : %s\n",  p->data.prenom);
                     printf("  Age         : %d\n",  p->data.age);
-                    printf("  Passeport   : %s\n",  p->data.num_passeport);
-                    printf("  Nationalite : %s\n",  p->data.nationalite);
+                    printf("  Passport    : %s\n",  p->data.num_passeport);
+                    printf("  Nationality : %s\n",  p->data.nationalite);
                     afficher_ligne('-', 60);
                 }
                 attendre_entree();
                 break;
             }
             case 4:{
-                afficher_entete("MODIFIER PASSAGER");
+                afficher_entete("MODIFY PASSENGER");
                 afficherPassagers(*listeP);
-                int id = saisir_entier("  ID du passager a modifier : ", 1, 99999);
+                int id = saisir_entier("  Passenger ID to modify : ", 1, 99999);
                 *listeP = ModifierPassager(*listeP, id);
                 attendre_entree();
                 break;
             }
             case 5:{
-                afficher_entete("SUPPRIMER PASSAGER");
+                afficher_entete("DELETE PASSENGER");
                 afficherPassagers(*listeP);
-                int id = saisir_entier("  ID du passager a supprimer : ", 1, 99999);
-                printf("  [?] Confirmer la suppression du passager %d et toutes ses reservations ? (1=Oui / 0=Non) : ", id);
+                int id = saisir_entier("  Passenger ID to delete : ", 1, 99999);
+                printf("  [?] Confirm deletion of passenger %d and all their reservations? (1=Yes / 0=No) : ", id);
                 int conf = saisir_entier("", 0, 1);
                 if(conf == 1) *listeP = SupprimerPassager(*listeP, listeR, listeV, id);
-                else printf("  Suppression annulee.\n");
+                else printf("  Deletion cancelled.\n");
                 attendre_entree();
                 break;
             }
@@ -664,20 +663,20 @@ void menu_passagers(noeud_p**listeP, noeud_r**listeR, noeud_v*listeV){
 void menu_reservations(noeud_r**listeR, noeud_v*listeV, noeud_p*listeP){
     int choix;
     do {
-        afficher_entete("GESTION DES RESERVATIONS");
-        printf("  [1] Ajouter une reservation\n");
-        printf("  [2] Afficher toutes les reservations\n");
-        printf("  [3] Supprimer une reservation\n");
-        printf("  [0] Retour au menu principal\n");
+        afficher_entete("RESERVATION MANAGEMENT");
+        printf("  [1] Add a reservation\n");
+        printf("  [2] Display all reservations\n");
+        printf("  [3] Delete a reservation\n");
+        printf("  [0] Back to main menu\n");
         afficher_ligne('-', 60);
-        choix = saisir_entier("  Votre choix : ", 0, 3);
+        choix = saisir_entier("  Your choice : ", 0, 3);
 
         switch(choix){
             case 1:{
-                afficher_entete("NOUVELLE RESERVATION");
-                printf("  Vols disponibles :\n");
+                afficher_entete("NEW RESERVATION");
+                printf("  Available flights:\n");
                 afficherVols(listeV);
-                printf("  Passagers enregistres :\n");
+                printf("  Registered passengers:\n");
                 afficherPassagers(listeP);
                 reservation r = saisir_reservation();
                 *listeR = AjoutReservation(*listeR, listeV, listeP, r);
@@ -685,19 +684,19 @@ void menu_reservations(noeud_r**listeR, noeud_v*listeV, noeud_p*listeP){
                 break;
             }
             case 2:{
-                afficher_entete("LISTE DES RESERVATIONS");
+                afficher_entete("RESERVATION LIST");
                 afficherReservations(*listeR);
                 attendre_entree();
                 break;
             }
             case 3:{
-                afficher_entete("SUPPRIMER RESERVATION");
+                afficher_entete("DELETE RESERVATION");
                 afficherReservations(*listeR);
-                int id = saisir_entier("  ID de la reservation a supprimer : ", 1, 99999);
-                printf("  [?] Confirmer la suppression ? (1=Oui / 0=Non) : ");
+                int id = saisir_entier("  Reservation ID to delete : ", 1, 99999);
+                printf("  [?] Confirm deletion? (1=Yes / 0=No) : ");
                 int conf = saisir_entier("", 0, 1);
                 if(conf == 1) *listeR = SupprimerReservation(*listeR, listeV, id);
-                else printf("  Suppression annulee.\n");
+                else printf("  Deletion cancelled.\n");
                 attendre_entree();
                 break;
             }
@@ -706,7 +705,7 @@ void menu_reservations(noeud_r**listeR, noeud_v*listeV, noeud_p*listeP){
 }
 
 /* ============================================================
-   LIBERATION MEMOIRE
+   MEMORY CLEANUP
    ============================================================ */
 void liberer_vols(noeud_v *tete){
     noeud_v *tmp;
@@ -724,7 +723,7 @@ void liberer_reservations(noeud_r *tete){
 }
 
 /* ============================================================
-   MAIN
+   MAIN FUNCTION
    ============================================================ */
 int main(){
     noeud_v* listeV = NULL;
@@ -733,14 +732,14 @@ int main(){
 
     int choix;
     do {
-        afficher_entete("MENU PRINCIPAL");
-        printf("  [1] Gestion des Vols\n");
-        printf("  [2] Gestion des Passagers\n");
-        printf("  [3] Gestion des Reservations\n");
+        afficher_entete("MAIN MENU");
+        printf("  [1] Flight Management\n");
+        printf("  [2] Passenger Management\n");
+        printf("  [3] Reservation Management\n");
         afficher_ligne('-', 60);
-        printf("  [0] Quitter\n");
+        printf("  [0] Quit\n");
         afficher_ligne('=', 60);
-        choix = saisir_entier("  Votre choix : ", 0, 3);
+        choix = saisir_entier("  Your choice : ", 0, 3);
 
         switch(choix){
             case 1: menu_vols(&listeV, &listeR);               break;
@@ -748,13 +747,13 @@ int main(){
             case 3: menu_reservations(&listeR, listeV, listeP); break;
             case 0:
                 afficher_ligne('=', 60);
-                printf("  Au revoir!\n");
+                printf("  Goodbye!\n");
                 afficher_ligne('=', 60);
                 break;
         }
     } while(choix != 0);
 
-    /* Liberation de toute la memoire allouee dynamiquement */
+    /* Free all dynamically allocated memory */
     liberer_reservations(listeR);
     liberer_passagers(listeP);
     liberer_vols(listeV);
